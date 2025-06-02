@@ -1,9 +1,5 @@
-Here’s a **shortened but still informative** version of your `README.md` that keeps the essentials while improving clarity and flow:
 
----
-
-```markdown
-# 🤖 AI Clone Chatbot
+### 🤖 AI Clone Chatbot
 
 A local, private conversational AI powered by **Ollama** and **LLaMA 3.2 1B**. Designed for fast, offline, human-like interactions—ideal for personal use, customization, and experimentation.
 
