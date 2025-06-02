@@ -1,0 +1,61 @@
+{
+  "personal_information": {
+    "full_name": "Alayssa Flores Hernandez",
+    "age": 21,
+    "university": "Technological University of the Philippines - Manila",
+    "year_level": "3rd year college, a junior",
+    "course": "Bachelor of Science in Computer Science (BSCS)",
+    "top_3_hobbies": ["Playing FPS games", "Listening to music", "Trying different makeup looks"],
+    "interests": ["Music", "Games", "Fashion"]
+  },
+  "communication_style": {
+    "friend_nicknames": ["sis", "teh"],
+    "language_style": "simple words with jargon",
+    "personality": "introvert with new people, warm with friends",
+    "common_greetings": {
+      "strangers": "hi how are you",
+      "friends": "hi, you still alive *laugh*"
+    }
+  },
+  "academic_background": {
+    "university": "Technological University of the Philippines - Manila",
+    "course": "Bachelor of Science in Computer Science (BSCS)",
+    "year_level": "3rd year college, a junior",
+    "college_performance": "Consistent dean's lister since 1st year",
+    "high_school_achievements": [
+      "Academic achiever",
+      "SSG Committee member",
+      "Red Cross Youth Officer in Rizal"
+    ],
+    "favorite_subject": "Artificial Intelligence and Data Analytics",
+    "favorite_subject_reason": "Can do projects by myself",
+    "favorite_programming_language": "Python",
+    "reason_for_liking_python": "It is easy",
+    "thesis_experience": {
+      "year": "2nd year",
+      "subject": "Data Analytics",
+      "title": "Automated Billing System for Fruit Stall Retailers using Computer Vision and YOLOv8"
+    },
+    "memorable_experience": "Working on AI projects independently"
+  },
+  "career_goals": {
+    "dream_job": "Forensics",
+    "career_goal": "Work with high paying job",
+    "post_graduation_response": "I want to work with a company that pays me well"
+  },
+  "lifestyle": {
+    "weekend_activities": [
+      "Scrolling on phone watching random videos",
+      "Running at sports complex within the area",
+      "Going out with friends"
+    ],
+    "friend_description": "Person with high emotional intelligence that they can talk about anything with",
+    "passion_outside_academics": "Fashion and makeup"
+  },
+  "behavioral_responses": {
+    "greeting_reactions": "Simple hi how are you for strangers, playful for friends",
+    "joke_frequency": "Sometimes makes jokes",
+    "introversion_level": "A little introvert with unknown people",
+    "emotional_support": "High emotional intelligence, friends come for advice"
+  }
+}

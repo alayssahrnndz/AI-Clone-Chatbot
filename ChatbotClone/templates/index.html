@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alayssa AI - Offline Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e8d5ff 0%, #d4b3ff 50%, #c299ff 100%);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-bottom: 1px solid #e0c7ff;
+            box-shadow: 0 2px 10px rgba(194, 153, 255, 0.1);
+        }
+
+        .header h1 {
+            color: #6b46c1;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 3px rgba(107, 70, 193, 0.1);
+        }
+
+        .status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: #6b46c1;
+            font-size: 0.9rem;
+            border: 1px solid #e0c7ff;
+            box-shadow: 0 2px 8px rgba(194, 153, 255, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.online { background: #10b981; }
+        .status-dot.offline { background: #ef4444; }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 1rem auto;
+            width: calc(100% - 2rem);
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(194, 153, 255, 0.15);
+            border: 1px solid #f3e8ff;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: linear-gradient(to bottom, #ffffff 0%, #fefbff 100%);
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #c299ff 0%, #a855f7 50%, #9333ea 100%);
+            color: white;
+            border: 1px solid #e0c7ff;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #ffffff 0%, #fefbff 50%, #f8f4ff 100%);
+            color: #4c1d95;
+            border: 1px solid #e0c7ff;
+        }
+
+        .message .sender {
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        /* Better spacing for lists and bullet points */
+        .message ul, .message ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .message li {
+            margin-bottom: 0.75rem;
+            padding-left: 0.25rem;
+        }
+
+        .message li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Nested list spacing */
+        .message ul ul, .message ol ol, .message ul ol, .message ol ul {
+            margin: 0.5rem 0;
+            padding-left: 1.25rem;
+        }
+
+        /* Custom bullet styling */
+        .message ul li {
+            list-style-type: disc;
+        }
+
+        .message ul li::marker {
+            color: #a855f7;
+        }
+
+        .message ol li {
+            list-style-type: decimal;
+        }
+
+        .message ol li::marker {
+            color: #a855f7;
+            font-weight: bold;
+        }
+
+        .chat-input-container {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #fefbff 0%, #f8f4ff 100%);
+            border-top: 1px solid #e0c7ff;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e0c7ff;
+            border-radius: 25px;
+            background: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            color: #4c1d95;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+            background: #fefbff;
+        }
+
+        .chat-input::placeholder {
+            color: #a78bfa;
+        }
+
+        .send-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #c299ff 0%, #a855f7 50%, #9333ea 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #a855f7;
+            margin: 1rem;
+            font-style: italic;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #a855f7;
+            margin: 2rem;
+            font-style: italic;
+            background: linear-gradient(135deg, #fefbff 0%, #f3e8ff 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid #e0c7ff;
+            box-shadow: 0 4px 15px rgba(194, 153, 255, 0.1);
+        }
+
+        .message.ai .typing::after {
+            content: '|';
+            animation: blink 1s infinite;
+            color: #a855f7;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 0.5rem;
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(194, 153, 255, 0.2);
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .chat-messages {
+                padding: 1rem;
+            }
+
+            .chat-input-container {
+                padding: 1rem;
+            }
+
+            .send-button {
+                padding: 1rem 1.5rem;
+            }
+
+            .header {
+                padding: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Alayssa AI</h1>
+        <div class="status">
+            <div class="status-indicator">
+                <div class="status-dot offline" id="statusDot"></div>
+                <span id="statusText">Checking connection...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                Hi there! I'm Alayssa Flores Hernandez, your offline AI assistant. Feel free to chat with me about anything! 🎮🎵💄
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div>Alayssa is typing... ✨</div>
+        </div>
+
+        <div class="chat-input-container">
+            <form class="chat-input-form" id="chatForm">
+                <input
+                    type="text"
+                    class="chat-input"
+                    id="messageInput"
+                    placeholder="Type your message here..."
+                    autocomplete="off"
+                >
+                <button type="submit" class="send-button" id="sendButton">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatForm = document.getElementById('chatForm');
+        const loading = document.getElementById('loading');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        // Helper function to scroll to bottom
+        function scrollToBottom() {
+            setTimeout(() => {
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 50);
+        }
+
+        // Global variable to track if AI is typing
+        let aiIsTyping = false;
+
+        // Typewriter effect for AI messages
+        function typeWriter(element, text, baseSpeed = 50) {
+            let i = 0;
+            element.textContent = '';
+            element.classList.add('typing');
+            aiIsTyping = true;
+
+            function typing() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+
+                    // Auto-scroll during typing
+                    if (i % 8 === 0) { // Scroll every 8 characters
+                        scrollToBottom();
+                    }
+
+                    // Add some randomness to typing speed for more natural feel
+                    const randomDelay = baseSpeed + Math.random() * 30;
+                    setTimeout(typing, randomDelay);
+                } else {
+                    // Remove typing cursor when complete
+                    element.classList.remove('typing');
+                    aiIsTyping = false;
+                    // Final scroll when typing is complete
+                    scrollToBottom();
+                }
+            }
+
+            typing();
+        }
+
+        // Check health status
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+
+                if (data.ollama_status === 'running' && data.model_loaded) {
+                    statusDot.className = 'status-dot online';
+                    statusText.textContent = 'Online & Ready';
+                } else if (data.ollama_status === 'running') {
+                    statusDot.className = 'status-dot offline';
+                    statusText.textContent = 'Model not loaded';
+                } else {
+                    statusDot.className = 'status-dot offline';
+                    statusText.textContent = 'Ollama not running';
+                }
+            } catch (error) {
+                statusDot.className = 'status-dot offline';
+                statusText.textContent = 'Connection error';
+            }
+        }
+
+        // Add message to chat
+        function addMessage(content, sender, useTyping = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const senderDiv = document.createElement('div');
+            senderDiv.className = 'sender';
+            senderDiv.textContent = sender === 'user' ? 'You' : 'Alayssa';
+
+            const contentDiv = document.createElement('div');
+
+            messageDiv.appendChild(senderDiv);
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+
+            // Remove welcome message if it exists
+            const welcomeMsg = chatMessages.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            // Use typing effect for AI messages, instant for user messages
+            if (useTyping && sender === 'ai') {
+                // Start typing effect
+                typeWriter(contentDiv, content);
+            } else {
+                // Instant display for user messages
+                contentDiv.textContent = content;
+                scrollToBottom();
+            }
+        }
+
+        // Send message
+        async function sendMessage(message) {
+            if (!message.trim() || aiIsTyping) return;
+
+            addMessage(message, 'user');
+            messageInput.value = '';
+            sendButton.disabled = true;
+            loading.classList.add('show');
+
+            // Scroll to show loading indicator
+            scrollToBottom();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                // Hide loading indicator before showing response
+                loading.classList.remove('show');
+
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'ai', false);
+                    sendButton.disabled = false;
+                } else {
+                    // Use typing effect for AI responses - sendButton will be re-enabled after typing
+                    addMessage(data.response, 'ai', true);
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                addMessage('Sorry, I encountered an error. Please make sure Ollama is running and the model is loaded.', 'ai', false);
+                sendButton.disabled = false;
+            }
+
+            messageInput.focus();
+        }
+
+        // Event listeners
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!aiIsTyping) {
+                sendMessage(messageInput.value);
+            }
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !aiIsTyping) {
+                e.preventDefault();
+                sendMessage(messageInput.value);
+            }
+        });
+
+        // Update button text based on AI typing status
+        function updateButtonState() {
+            if (aiIsTyping) {
+                sendButton.textContent = 'Alayssa is typing...';
+                sendButton.disabled = true;
+            } else {
+                sendButton.textContent = 'Send';
+                sendButton.disabled = false;
+            }
+        }
+
+        // Check button state periodically
+        setInterval(updateButtonState, 100);
+
+        // Initialize
+        checkHealth();
+        setInterval(checkHealth, 30000); // Check every 30 seconds
+        messageInput.focus();
+    </script>
+</body>
+</html>
